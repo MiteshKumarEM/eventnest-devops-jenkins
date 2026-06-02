@@ -1,0 +1,10 @@
+node_modules/
+coverage/
+reports/*
+!reports/.gitkeep
+data/*.db
+data/*.sqlite
+.env
+.DS_Store
+*.log
+artifacts/

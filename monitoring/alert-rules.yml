@@ -1,0 +1,26 @@
+groups:
+  - name: eventnest-availability
+    rules:
+      - alert: EventNestApplicationDown
+        expr: up{job="eventnest-production"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          application: eventnest
+        annotations:
+          summary: "EventNest production application is unavailable"
+          description: "Prometheus has been unable to scrape the EventNest production service for more than 30 seconds."
+
+      - alert: EventNestHighServerErrorRate
+        expr: |
+          sum(rate(eventnest_http_request_duration_seconds_count{status_code=~"5.."}[2m]))
+          /
+          clamp_min(sum(rate(eventnest_http_request_duration_seconds_count[2m])), 1)
+          > 0.05
+        for: 1m
+        labels:
+          severity: warning
+          application: eventnest
+        annotations:
+          summary: "EventNest is returning elevated server errors"
+          description: "More than 5 percent of EventNest requests returned a server error during the evaluation window."

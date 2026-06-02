@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventNest | Discover and Book Events</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+  <script defer src="/app.js"></script>
+</head>
+<body>
+  <header class="hero">
+    <nav class="navigation">
+      <a class="brand" href="/">Event<span>Nest</span></a>
+      <a class="health-link" href="/api/health" target="_blank" rel="noopener">System Health</a>
+    </nav>
+    <div class="hero-content">
+      <p class="eyebrow">Melbourne Events Platform</p>
+      <h1>Find an event worth showing up for.</h1>
+      <p class="hero-text">Explore local workshops, community meetups and experiences. Book a seat instantly and keep your plans organised.</p>
+      <a class="primary-button" href="#events">Browse events</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="dashboard" aria-label="Platform summary">
+      <article><span id="event-count">0</span><p>Upcoming events</p></article>
+      <article><span id="booking-count">0</span><p>Active bookings</p></article>
+      <article><span id="seat-count">0</span><p>Seats remaining</p></article>
+      <article class="status-card"><span class="status-dot"></span><p>Platform operational</p></article>
+    </section>
+
+    <section class="content-section" id="events">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow dark">Explore</p>
+          <h2>Upcoming events</h2>
+        </div>
+        <div class="filters">
+          <input id="search-input" type="search" placeholder="Search events or venues">
+          <select id="category-filter" aria-label="Filter by category">
+            <option value="">All categories</option>
+            <option value="Technology">Technology</option>
+            <option value="Workshop">Workshop</option>
+            <option value="Wellbeing">Wellbeing</option>
+            <option value="Community">Community</option>
+          </select>
+        </div>
+      </div>
+      <div id="event-list" class="event-grid"></div>
+    </section>
+
+    <section class="manage-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow dark">Organiser view</p>
+          <h2>Create a new event</h2>
+        </div>
+        <p class="helper">This section demonstrates administrator functionality for the DevOps project.</p>
+      </div>
+      <form id="event-form" class="form-grid">
+        <label>Event title<input required name="title" placeholder="Cloud Engineering Evening"></label>
+        <label>Category<input required name="category" placeholder="Technology"></label>
+        <label>Venue<input required name="venue" placeholder="Melbourne Convention Centre"></label>
+        <label>Date and time<input required name="eventDate" type="datetime-local"></label>
+        <label class="full">Description<textarea required name="description" rows="3" placeholder="Describe what attendees can expect."></textarea></label>
+        <label>Capacity<input required name="capacity" type="number" min="1" max="1000" value="40"></label>
+        <button class="primary-button submit-button" type="submit">Create event</button>
+      </form>
+    </section>
+  </main>
+
+  <dialog id="booking-dialog">
+    <button class="close-button" id="close-dialog" aria-label="Close booking form">×</button>
+    <p class="eyebrow dark">Reserve your seat</p>
+    <h2 id="selected-event-title">Event booking</h2>
+    <form id="booking-form">
+      <input type="hidden" name="eventId">
+      <label>Full name<input required name="attendeeName" placeholder="Your name"></label>
+      <label>Email address<input required name="attendeeEmail" type="email" placeholder="name@email.com"></label>
+      <label>Number of tickets<input required name="tickets" type="number" min="1" max="5" value="1"></label>
+      <button class="primary-button" type="submit">Confirm booking</button>
+    </form>
+  </dialog>
+
+  <div id="notification" role="status" class="notification" hidden></div>
+
+  <footer>
+    <strong>EventNest</strong>
+    <p>Built for reliable event bookings and monitored deployment.</p>
+  </footer>
+</body>
+</html>
