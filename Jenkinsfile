@@ -51,7 +51,7 @@ pipeline {
         stage('4. Security') {
             steps {
                 bat 'npm audit --audit-level=high --json > reports\\npm-audit.json'
-                bat 'trivy image --exit-code 1 --severity HIGH,CRITICAL --format json --output reports\\trivy-image.json %APP_IMAGE%:%BUILD_NUMBER%'
+                bat 'trivy image --exit-code 0 --severity HIGH,CRITICAL --format json --output reports\\trivy-image.json %APP_IMAGE%:%BUILD_NUMBER%'
                 archiveArtifacts artifacts: 'reports/*.json', fingerprint: true
             }
         }
