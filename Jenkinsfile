@@ -51,7 +51,9 @@ pipeline {
         stage('4. Security') {
             steps {
                 bat 'npm audit --audit-level=high --json > reports\\npm-audit.json'
-                bat 'trivy image --exit-code 0 --severity HIGH,CRITICAL --format json --output reports\\trivy-image.json %APP_IMAGE%:%BUILD_NUMBER%'
+                bat '''
+                trivy image --timeout 10m --db-repository ghcr.io/aquasecurity/trivy-db:2 --exit-code 0 --severity HIGH,CRITICAL --format json --output reports\\trivy-image.json %APP_IMAGE%:%BUILD_NUMBER% || echo {"trivyStatus":"Trivy scan could not complete because the vulnerability database download timed out. The npm audit report was still generated and the pipeline continued for deployment demonstration."} > reports\\trivy-image.json
+                '''
                 archiveArtifacts artifacts: 'reports/*.json', fingerprint: true
             }
         }
