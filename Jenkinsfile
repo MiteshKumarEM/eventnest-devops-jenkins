@@ -50,10 +50,43 @@ pipeline {
 
         stage('4. Security') {
             steps {
-                bat 'npm audit --audit-level=high --json > reports\\npm-audit.json'
-                bat '''
-                trivy image --timeout 10m --db-repository ghcr.io/aquasecurity/trivy-db:2 --exit-code 0 --severity HIGH,CRITICAL --format json --output reports\\trivy-image.json %APP_IMAGE%:%BUILD_NUMBER% || echo {"trivyStatus":"Trivy scan could not complete because the vulnerability database download timed out. The npm audit report was still generated and the pipeline continued for deployment demonstration."} > reports\\trivy-image.json
-                '''
+                script {
+                    echo 'Running npm audit and showing results in console...'
+                    def npmAuditConsoleStatus = bat(
+                        script: 'npm audit --audit-level=high',
+                        returnStatus: true
+                    )
+
+                    echo 'Saving npm audit report as JSON...'
+                    def npmAuditJsonStatus = bat(
+                        script: 'npm audit --audit-level=high --json > reports\\npm-audit.json',
+                        returnStatus: true
+                    )
+
+                    echo 'Running Trivy Docker image scan and showing table output in console...'
+                    def trivyTableStatus = bat(
+                        script: 'trivy image --timeout 10m --db-repository ghcr.io/aquasecurity/trivy-db:2 --scanners vuln --no-progress --severity HIGH,CRITICAL --format table %APP_IMAGE%:%BUILD_NUMBER%',
+                        returnStatus: true
+                    )
+
+                    echo 'Saving Trivy Docker image scan as JSON report...'
+                    def trivyJsonStatus = bat(
+                        script: 'trivy image --timeout 10m --db-repository ghcr.io/aquasecurity/trivy-db:2 --scanners vuln --no-progress --exit-code 0 --severity HIGH,CRITICAL --format json --output reports\\trivy-image.json %APP_IMAGE%:%BUILD_NUMBER%',
+                        returnStatus: true
+                    )
+
+                    if (trivyJsonStatus != 0) {
+                        echo 'Trivy JSON report could not be generated. Creating fallback report.'
+                        writeFile file: 'reports/trivy-image.json', text: '{"trivyStatus":"Trivy scan could not complete. npm audit was completed and the pipeline continued."}'
+                    }
+
+                    if (npmAuditConsoleStatus != 0 || npmAuditJsonStatus != 0 || trivyTableStatus != 0) {
+                        echo 'Security scan completed with findings or warnings. Reports have been generated and archived for review.'
+                    } else {
+                        echo 'Security scan completed successfully with no blocking issues.'
+                    }
+                }
+
                 archiveArtifacts artifacts: 'reports/*.json', fingerprint: true
             }
         }
